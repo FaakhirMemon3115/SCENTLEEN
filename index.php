@@ -1,7 +1,21 @@
 <?php
-// login.php
-require_once 'includes/header.php';
+// index.php (Login Page as Landing)
 require_once 'config/database.php';
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['user_role'] == 'admin') {
+        header("Location: admin/index.php");
+    } else {
+        header("Location: home.php");
+    }
+    exit;
+}
+
+require_once 'includes/header.php';
 
 $error = '';
 
@@ -39,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div style="background: #fff; padding: 50px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); width: 100%; max-width: 500px; margin: 40px 20px;">
         
         <div class="text-center mb-4">
-            <a href="index.php" style="display: inline-block; padding: 20px; border: 2px solid var(--gold-color); border-radius: 10px; margin-bottom: 30px;">
+            <a href="home.php" style="display: inline-block; padding: 20px; border: 2px solid var(--gold-color); border-radius: 10px; margin-bottom: 30px;">
                 <span style="font-size: 3rem; line-height: 0.8; display: block; font-family: var(--font-heading); margin-bottom: 5px; color: var(--text-color);">$</span>
                 <span style="font-size: 1.5rem; letter-spacing: 3px; font-family: var(--font-heading); color: var(--text-color);">SCENTLEEN</span>
             </a>
