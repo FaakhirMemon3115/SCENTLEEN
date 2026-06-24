@@ -6,7 +6,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Basic Admin Auth Check
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit;
 }
 ?>
@@ -74,6 +74,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
                 <img src="https://ui-avatars.com/api/?name=Admin&background=C9A96E&color=fff" style="width: 35px; height: 35px; border-radius: 50%;">
                 <span style="font-size: 0.9rem; font-weight: 500;"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></span>
             </div>
-            <a href="../login.php" style="color: #e74c3c;"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="../index.php" style="color: #e74c3c;"><i class="fas fa-sign-out-alt"></i></a>
         </div>
     </header>

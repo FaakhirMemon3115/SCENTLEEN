@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <?php if($success): ?>
             <div style="background: #eafaf1; color: #27ae60; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 0.9rem; border-left: 4px solid #27ae60;">
-                <?php echo $success; ?> <a href="login.php" style="font-weight: bold; text-decoration: underline;">Login here</a>.
+                <?php echo $success; ?> <a href="index.php" style="font-weight: bold; text-decoration: underline;">Login here</a>.
             </div>
         <?php else: ?>
 
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
 
         <div style="text-align: center; margin-top: 30px; font-size: 0.9rem; color: #666;">
-            Already have an account? <a href="login.php" style="color: var(--gold-color); font-weight: 600;">Sign In</a>
+            Already have an account? <a href="index.php" style="color: var(--gold-color); font-weight: 600;">Sign In</a>
         </div>
     </div>
 
