@@ -33,7 +33,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <header id="main-header">
     <div class="logo">
-        <a href="index.php">
+        <a href="home.php">
             <span style="font-size: 2.5rem; line-height: 0.8; display: block; margin-bottom: -5px;">$</span>
             <span style="font-size: 1.2rem; letter-spacing: 5px;">SCENTLEEN</span>
         </a>
@@ -41,7 +41,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <nav>
         <ul>
-            <li><a href="index.php">Home</a></li>
+            <li><a href="home.php">Home</a></li>
             <li><a href="shop.php">Shop</a></li>
             <li><a href="shop.php?category=men">Men</a></li>
             <li><a href="shop.php?category=women">Women</a></li>
@@ -54,6 +54,6 @@ if (session_status() == PHP_SESSION_NONE) {
         <a href="#"><i class="fas fa-search"></i></a>
         <a href="wishlist.php"><i class="far fa-heart"></i></a>
         <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
-        <a href="login.php"><i class="far fa-user"></i></a>
+        <a href="index.php"><i class="far fa-user"></i></a>
     </div>
 </header>
