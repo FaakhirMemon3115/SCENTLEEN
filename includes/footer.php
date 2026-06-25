@@ -40,9 +40,9 @@ $base_url  = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/SCENTLEEN/';
                 <h4 style="color: var(--gold-color); margin-bottom: 20px;">Support</h4>
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
                     <li><a href="contact.php">Contact Us</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Shipping Policy</a></li>
-                    <li><a href="#">Returns &amp; Refunds</a></li>
+                    <li><a href="faq.php">FAQ</a></li>
+                    <li><a href="shipping.php">Shipping Policy</a></li>
+                    <li><a href="returns.php">Returns &amp; Refunds</a></li>
                 </ul>
             </div>
         </div>
