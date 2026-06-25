@@ -90,8 +90,8 @@ try {
                     <h4 style="margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Price Range</h4>
                     <input type="range" min="0" max="1000" value="500" style="width: 100%; accent-color: var(--text-color);">
                     <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 5px;">
-                        <span>$0</span>
-                        <span>$1000+</span>
+                        <span>Rs. 0</span>
+                        <span>Rs. 1000+</span>
                     </div>
                 </div>
             </aside>
@@ -132,10 +132,10 @@ try {
                                 
                                 <div class="price" style="color: var(--gold-color); font-weight: 600; margin-bottom: 15px; font-size: 1.1rem;">
                                     <?php if($product['sale_price']): ?>
-                                        <span style="text-decoration: line-through; color: #999; font-size: 0.9rem; margin-right: 5px;">$<?php echo number_format($product['price'], 2); ?></span>
-                                        $<?php echo number_format($product['sale_price'], 2); ?>
+                                        <span style="text-decoration: line-through; color: #999; font-size: 0.9rem; margin-right: 5px;">Rs. <?php echo number_format($product['price'], 2); ?></span>
+                                        Rs. <?php echo number_format($product['sale_price'], 2); ?>
                                     <?php else: ?>
-                                        $<?php echo number_format($product['price'], 2); ?>
+                                        Rs. <?php echo number_format($product['price'], 2); ?>
                                     <?php endif; ?>
                                 </div>
                                 

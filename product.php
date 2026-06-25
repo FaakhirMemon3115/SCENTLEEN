@@ -71,10 +71,10 @@ $img = $product['image'] ? 'uploads/'.$product['image'] : 'https://images.unspla
 
                 <div class="price" style="font-size: 2rem; color: var(--text-color); font-weight: 600; margin-bottom: 30px; font-family: var(--font-heading);">
                     <?php if($product['sale_price']): ?>
-                        <span style="text-decoration: line-through; color: #ccc; font-size: 1.3rem; margin-right: 15px; font-weight: 400;">$<?php echo number_format($product['price'], 2); ?></span>
-                        $<?php echo number_format($product['sale_price'], 2); ?>
+                        <span style="text-decoration: line-through; color: #ccc; font-size: 1.3rem; margin-right: 15px; font-weight: 400;">Rs. <?php echo number_format($product['price'], 2); ?></span>
+                        Rs. <?php echo number_format($product['sale_price'], 2); ?>
                     <?php else: ?>
-                        $<?php echo number_format($product['price'], 2); ?>
+                        Rs. <?php echo number_format($product['price'], 2); ?>
                     <?php endif; ?>
                 </div>
 
