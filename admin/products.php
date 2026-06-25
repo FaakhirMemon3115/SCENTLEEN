@@ -3,6 +3,16 @@
 require_once '../config/database.php';
 require_once 'includes/header.php';
 
+// Handle Delete
+if (isset($_GET['delete'])) {
+    $del_id = (int)$_GET['delete'];
+    try {
+        $pdo->prepare("DELETE FROM products WHERE id = :id")->execute([':id' => $del_id]);
+    } catch(PDOException $e) {}
+    header("Location: products.php?msg=deleted");
+    exit;
+}
+
 // Fetch products
 try {
     $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC");
@@ -16,6 +26,10 @@ try {
     <h2 style="font-size: 1.5rem; font-weight: 500;">Product Management</h2>
     <a href="product_add.php" style="background: var(--text-color); color: #fff; padding: 10px 20px; border-radius: 5px; font-size: 0.9rem; text-decoration: none;"><i class="fas fa-plus"></i> Add New Product</a>
 </div>
+
+<?php if(isset($_GET['msg']) && $_GET['msg'] == 'deleted'): ?>
+<div style="background:#fdeaea;color:#e74c3c;padding:12px 20px;border-radius:5px;margin-bottom:20px;border-left:4px solid #e74c3c;">Product deleted successfully.</div>
+<?php endif; ?>
 
 <div class="card" style="overflow-x: auto;">
     <table class="admin-table">
@@ -48,9 +62,9 @@ try {
                     <td><?php echo htmlspecialchars($p['category_name']); ?></td>
                     <td>
                         <?php if($p['sale_price']): ?>
-                            $<?php echo number_format($p['sale_price'], 2); ?> <span style="text-decoration: line-through; color: #999; font-size: 0.8rem;">$<?php echo number_format($p['price'], 2); ?></span>
+                            Rs. <?php echo number_format($p['sale_price'], 2); ?> <span style="text-decoration: line-through; color: #999; font-size: 0.8rem;">Rs. <?php echo number_format($p['price'], 2); ?></span>
                         <?php else: ?>
-                            $<?php echo number_format($p['price'], 2); ?>
+                            Rs. <?php echo number_format($p['price'], 2); ?>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -64,8 +78,8 @@ try {
                         <?php endif; ?>
                     </td>
                     <td style="text-align: right;">
-                        <a href="#" style="color: #3498db; margin-right: 10px;" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="#" style="color: #e74c3c;" title="Delete" onclick="return confirm('Are you sure you want to delete this product?');"><i class="fas fa-trash"></i></a>
+                        <a href="product_edit.php?id=<?php echo $p['id']; ?>" style="color: #3498db; margin-right: 10px;" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="products.php?delete=<?php echo $p['id']; ?>" style="color: #e74c3c;" title="Delete" onclick="return confirm('Are you sure you want to delete this product? This cannot be undone.');"><i class="fas fa-trash"></i></a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
