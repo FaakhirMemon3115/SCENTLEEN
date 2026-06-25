@@ -3,7 +3,6 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-require_once 'includes/header.php';
 require_once 'config/database.php';
 
 // Handle Item Removal
@@ -29,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_cart'])) {
     header("Location: cart.php");
     exit;
 }
+
+require_once 'includes/header.php';
 
 $cart_items = [];
 $subtotal = 0;
