@@ -2,9 +2,9 @@
 // config/database.php
 
 $host = 'localhost';
-$db_name = 'scentleen';
-$username = 'root';
-$password = '';
+$db_name = 'SCENTLEEN_DB';
+$username = 'SCENTLEEN_DB';
+$password = 'Scentleen_DB1';
 
 try {
     $pdo = new PDO("mysql:host={$host};dbname={$db_name};charset=utf8", $username, $password);
