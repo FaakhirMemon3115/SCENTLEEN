@@ -3,12 +3,22 @@
 require_once '../config/database.php';
 require_once 'includes/header.php';
 
-// Mock data for Dashboard MVP
-$total_orders = 156;
-$total_revenue = 45200.00;
-$total_customers = 89;
-$total_products = 45;
+// Real stats from DB
+try {
+    $total_orders   = $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn();
+    $total_revenue  = $pdo->query("SELECT COALESCE(SUM(total), 0) FROM orders WHERE status != 'Cancelled'")->fetchColumn();
+    $total_customers= $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'customer'")->fetchColumn();
+    $total_products = $pdo->query("SELECT COUNT(*) FROM products WHERE status = 'active'")->fetchColumn();
+} catch(PDOException $e) {
+    $total_orders = $total_revenue = $total_customers = $total_products = 0;
+}
 
+// Real recent orders
+try {
+    $recent_orders = $pdo->query("SELECT o.*, u.name as customer_name FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC LIMIT 5")->fetchAll();
+} catch(PDOException $e) {
+    $recent_orders = [];
+}
 ?>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
@@ -25,10 +35,10 @@ $total_products = 45;
     <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
         <div>
             <p style="color: #666; font-size: 0.9rem; text-transform: uppercase;">Total Revenue</p>
-            <h3 style="font-size: 2rem; margin-top: 5px;">$<?php echo number_format($total_revenue); ?></h3>
+            <h3 style="font-size: 2rem; margin-top: 5px;">Rs. <?php echo number_format($total_revenue); ?></h3>
         </div>
         <div style="width: 50px; height: 50px; background: rgba(39, 174, 96, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #27ae60; font-size: 1.5rem;">
-            <i class="fas fa-dollar-sign"></i>
+            <i class="fas fa-rupee-sign"></i>
         </div>
     </div>
 
@@ -65,27 +75,24 @@ $total_products = 45;
     <div class="card">
         <h3 style="margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 15px;">Recent Orders</h3>
         <div style="display: flex; flex-direction: column; gap: 15px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4 style="font-size: 0.9rem; margin-bottom: 3px;">#ORD-0012</h4>
-                    <p style="font-size: 0.8rem; color: #999;">John Doe</p>
+            <?php if(empty($recent_orders)): ?>
+                <p style="color: #999; font-size: 0.9rem;">No orders yet.</p>
+            <?php else: ?>
+                <?php foreach($recent_orders as $ord): ?>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5f5f5; padding-bottom: 12px;">
+                    <div>
+                        <h4 style="font-size: 0.9rem; margin-bottom: 3px;"><?php echo htmlspecialchars($ord['order_number']); ?></h4>
+                        <p style="font-size: 0.8rem; color: #999;"><?php echo htmlspecialchars($ord['customer_name'] ?? 'Guest'); ?></p>
+                    </div>
+                    <?php
+                        $badge = 'badge-warning';
+                        if($ord['status'] == 'Delivered') $badge = 'badge-success';
+                        if($ord['status'] == 'Cancelled') $badge = 'badge-danger';
+                    ?>
+                    <span class="badge <?php echo $badge; ?>"><?php echo $ord['status']; ?></span>
                 </div>
-                <span class="badge badge-warning">Pending</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4 style="font-size: 0.9rem; margin-bottom: 3px;">#ORD-0011</h4>
-                    <p style="font-size: 0.8rem; color: #999;">Sarah Smith</p>
-                </div>
-                <span class="badge badge-success">Delivered</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4 style="font-size: 0.9rem; margin-bottom: 3px;">#ORD-0010</h4>
-                    <p style="font-size: 0.8rem; color: #999;">Michael Brown</p>
-                </div>
-                <span class="badge badge-success">Delivered</span>
-            </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
             <a href="orders.php" style="display: block; text-align: center; font-size: 0.9rem; color: var(--gold-color); margin-top: 10px;">View All</a>
         </div>
     </div>
