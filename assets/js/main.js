@@ -118,4 +118,86 @@ document.addEventListener("DOMContentLoaded", (event) => {
         });
     });
 
+    });
+
 });
+
+// Global E-Commerce Functions
+window.addToCart = function(productId) {
+    const qtyInput = document.getElementById('qty');
+    const qty = qtyInput ? qtyInput.value : 1;
+    const btn = event.currentTarget || event.target;
+    const originalContent = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('qty', qty);
+
+    fetch('ajax_add_to_cart.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Added';
+            btn.style.backgroundColor = 'var(--gold-color)';
+            btn.style.borderColor = 'var(--gold-color)';
+            btn.style.color = '#fff';
+            
+            // Optionally update cart icon count
+            const cartCountElem = document.querySelector('.fa-shopping-cart + span.badge');
+            if(cartCountElem && data.cart_count) {
+                cartCountElem.innerText = data.cart_count;
+            }
+
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        } else {
+            alert(data.message);
+            btn.innerHTML = originalContent;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        btn.innerHTML = originalContent;
+    });
+};
+
+window.toggleWishlist = function(elem, productId) {
+    // Some pages pass 'this' as first arg, some rely on event.currentTarget
+    const btn = typeof elem === 'object' && elem instanceof Element ? elem : (event.currentTarget || event.target);
+    
+    const formData = new FormData();
+    formData.append('product_id', productId);
+
+    fetch('ajax_toggle_wishlist.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            if(data.is_active) {
+                btn.classList.add('active');
+                if (btn.querySelector('i')) {
+                    btn.innerHTML = '<i class="fas fa-heart"></i>';
+                }
+            } else {
+                btn.classList.remove('active');
+                if (btn.querySelector('i')) {
+                    btn.innerHTML = '<i class="far fa-heart"></i>';
+                }
+            }
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(err => console.error(err));
+};

@@ -151,35 +151,6 @@ function updateQty(change) {
         qtyInput.value = newVal;
     }
 }
-
-function addToCart(productId) {
-    const qty = document.getElementById('qty').value;
-    const btn = event.currentTarget;
-    const originalContent = btn.innerHTML;
-    
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-    
-    setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
-        btn.style.backgroundColor = 'var(--gold-color)';
-        btn.style.borderColor = 'var(--gold-color)';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.style.backgroundColor = 'var(--text-color)';
-            btn.style.borderColor = 'var(--text-color)';
-        }, 2000);
-    }, 800);
-}
-
-function toggleWishlist(btn, productId) {
-    btn.classList.toggle('active');
-    if(btn.classList.contains('active')) {
-        btn.innerHTML = '<i class="fas fa-heart"></i>';
-    } else {
-        btn.innerHTML = '<i class="far fa-heart"></i>';
-    }
-}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

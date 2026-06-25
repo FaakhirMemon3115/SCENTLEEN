@@ -174,29 +174,7 @@ try {
 </style>
 
 <script>
-function addToCart(productId) {
-    // Basic AJAX cart simulation for MVP
-    const btn = event.target;
-    const originalText = btn.innerText;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-    
-    setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check"></i> Added';
-        btn.style.backgroundColor = 'var(--text-color)';
-        btn.style.color = '#fff';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.backgroundColor = 'transparent';
-            btn.style.color = 'var(--text-color)';
-        }, 2000);
-    }, 800);
-}
-
-function toggleWishlist(productId) {
-    const icon = event.currentTarget;
-    icon.classList.toggle('active');
-}
+// Moved addToCart and toggleWishlist to global scope (main.js)
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
