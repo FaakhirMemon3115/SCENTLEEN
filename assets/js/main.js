@@ -116,41 +116,54 @@ document.addEventListener("DOMContentLoaded", (event) => {
         card.addEventListener('mouseenter', function() {
             card.style.transition = 'none';
         });
-    });
 
     });
 
 });
 
+
 // Global E-Commerce Functions
 window.addToCart = function(productId) {
     const qtyInput = document.getElementById('qty');
-    const qty = qtyInput ? qtyInput.value : 1;
+    const qty = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
     const btn = event.currentTarget || event.target;
     const originalContent = btn.innerHTML;
-    
+    const base = window.SCENTLEEN_BASE || '/';
+
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    btn.disabled = true;
     
     const formData = new FormData();
     formData.append('product_id', productId);
     formData.append('qty', qty);
 
-    fetch('ajax_add_to_cart.php', {
+    fetch(base + 'ajax_add_to_cart.php', {
         method: 'POST',
         body: formData
     })
     .then(res => res.json())
     .then(data => {
+        btn.disabled = false;
         if(data.success) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Added';
-            btn.style.backgroundColor = 'var(--gold-color)';
-            btn.style.borderColor = 'var(--gold-color)';
+            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            btn.style.backgroundColor = '#27ae60';
+            btn.style.borderColor = '#27ae60';
             btn.style.color = '#fff';
-            
-            // Optionally update cart icon count
-            const cartCountElem = document.querySelector('.fa-shopping-cart + span.badge');
-            if(cartCountElem && data.cart_count) {
-                cartCountElem.innerText = data.cart_count;
+
+            // Update cart badge in header
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge && data.cart_count) {
+                badge.innerText = data.cart_count;
+                badge.style.display = 'flex';
+            } else if (data.cart_count > 0) {
+                // Badge might not exist yet — add it
+                const cartLink = document.querySelector('.cart-icon-wrapper');
+                if (cartLink && !cartLink.querySelector('.cart-count-badge')) {
+                    const b = document.createElement('span');
+                    b.className = 'cart-count-badge';
+                    b.innerText = data.cart_count;
+                    cartLink.appendChild(b);
+                }
             }
 
             setTimeout(() => {
@@ -160,24 +173,25 @@ window.addToCart = function(productId) {
                 btn.style.color = '';
             }, 2000);
         } else {
-            alert(data.message);
             btn.innerHTML = originalContent;
+            alert(data.message || 'Could not add to cart.');
         }
     })
     .catch(err => {
-        console.error(err);
+        btn.disabled = false;
         btn.innerHTML = originalContent;
+        console.error('addToCart error:', err);
     });
 };
 
 window.toggleWishlist = function(elem, productId) {
-    // Some pages pass 'this' as first arg, some rely on event.currentTarget
-    const btn = typeof elem === 'object' && elem instanceof Element ? elem : (event.currentTarget || event.target);
+    const btn = (elem && elem instanceof Element) ? elem : (event.currentTarget || event.target);
+    const base = window.SCENTLEEN_BASE || '/';
     
     const formData = new FormData();
     formData.append('product_id', productId);
 
-    fetch('ajax_toggle_wishlist.php', {
+    fetch(base + 'ajax_toggle_wishlist.php', {
         method: 'POST',
         body: formData
     })
@@ -186,18 +200,14 @@ window.toggleWishlist = function(elem, productId) {
         if(data.success) {
             if(data.is_active) {
                 btn.classList.add('active');
-                if (btn.querySelector('i')) {
-                    btn.innerHTML = '<i class="fas fa-heart"></i>';
-                }
+                btn.style.color = '#e74c3c';
+                if (btn.querySelector('i')) btn.querySelector('i').className = 'fas fa-heart';
             } else {
                 btn.classList.remove('active');
-                if (btn.querySelector('i')) {
-                    btn.innerHTML = '<i class="far fa-heart"></i>';
-                }
+                btn.style.color = '#ccc';
+                if (btn.querySelector('i')) btn.querySelector('i').className = 'far fa-heart';
             }
-        } else {
-            alert(data.message);
         }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error('toggleWishlist error:', err));
 };

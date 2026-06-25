@@ -1,5 +1,8 @@
 <?php
 // includes/footer.php
+// Determine base URL dynamically
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$base_url  = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/SCENTLEEN/';
 ?>
     <footer style="background-color: var(--text-color); color: var(--secondary-color); padding: 60px 5% 20px;">
         <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; margin-bottom: 40px;">
@@ -24,12 +27,22 @@
             </div>
 
             <div style="flex: 1; min-width: 150px;">
+                <h4 style="color: var(--gold-color); margin-bottom: 20px;">Account</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                    <li><a href="account.php">My Account</a></li>
+                    <li><a href="wishlist.php">My Wishlist</a></li>
+                    <li><a href="cart.php">My Cart</a></li>
+                    <li><a href="index.php">Login / Register</a></li>
+                </ul>
+            </div>
+
+            <div style="flex: 1; min-width: 150px;">
                 <h4 style="color: var(--gold-color); margin-bottom: 20px;">Support</h4>
                 <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
                     <li><a href="contact.php">Contact Us</a></li>
                     <li><a href="#">FAQ</a></li>
                     <li><a href="#">Shipping Policy</a></li>
-                    <li><a href="#">Returns & Refunds</a></li>
+                    <li><a href="#">Returns &amp; Refunds</a></li>
                 </ul>
             </div>
         </div>
@@ -51,7 +64,12 @@
     <!-- AOS JS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+    <!-- Set base URL for AJAX calls (works regardless of subdirectory) -->
+    <script>
+        window.SCENTLEEN_BASE = '<?php echo $base_url; ?>';
+    </script>
+
     <!-- Custom Main JS -->
-    <script src="assets/js/main.js"></script>
+    <script src="<?php echo $base_url; ?>assets/js/main.js"></script>
 </body>
 </html>
