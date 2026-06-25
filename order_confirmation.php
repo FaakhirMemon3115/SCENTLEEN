@@ -82,6 +82,14 @@ try {
         ]);
     }
 
+    // Handle Coupon deactivation if one was used
+    $coupon_snapshot = $_SESSION['coupon'] ?? null;
+    if ($coupon_snapshot) {
+        $stmt3 = $pdo->prepare("UPDATE coupons SET status = 'inactive' WHERE id = :cid");
+        $stmt3->execute([':cid' => $coupon_snapshot['id']]);
+        unset($_SESSION['coupon']);
+    }
+
     // Clear the cart
     $cart_snapshot = $_SESSION['cart'];
     unset($_SESSION['cart']);
@@ -123,9 +131,25 @@ foreach (($cart_snapshot ?? []) as $pid => $item) {
     $cart_rows_text .= "  - {$name} x{$item['qty']} — Rs. {$line_total}\n";
 }
 
-$subtotal_fmt = number_format($total - $shipping, 2);
+$true_subtotal = 0;
+foreach (($cart_snapshot ?? []) as $pid => $item) {
+    $true_subtotal += $item['price'] * $item['qty'];
+}
+
+$subtotal_fmt = number_format($true_subtotal, 2);
 $shipping_fmt = number_format($shipping, 2);
 $total_fmt    = number_format($total, 2);
+
+$discount_html = '';
+if ($coupon_snapshot) {
+    $discount_amt = ($true_subtotal * $coupon_snapshot['discount']) / 100;
+    $disc_fmt = number_format($discount_amt, 2);
+    $discount_html = "
+    <tr>
+        <td colspan='3' style='padding:10px;text-align:right;color:#27ae60;font-weight:600;font-size:14px;'>Discount ({$coupon_snapshot['code']} - {$coupon_snapshot['discount']}%)</td>
+        <td style='padding:10px;text-align:right;color:#27ae60;font-weight:600;font-size:14px;'>- Rs. {$disc_fmt}</td>
+    </tr>";
+}
 
 $email_subject = "Order Confirmed! #{$order_number} — Scentleen";
 
@@ -188,6 +212,7 @@ $email_body_html = <<<HTML
                             <td colspan="3" style="padding:10px;text-align:right;color:#666;font-size:14px;">Subtotal</td>
                             <td style="padding:10px;text-align:right;font-size:14px;">Rs. {$subtotal_fmt}</td>
                         </tr>
+                        {$discount_html}
                         <tr>
                             <td colspan="3" style="padding:10px;text-align:right;color:#666;font-size:14px;">Shipping</td>
                             <td style="padding:10px;text-align:right;font-size:14px;">Rs. {$shipping_fmt}</td>

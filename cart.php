@@ -12,6 +12,39 @@ if (isset($_GET['remove']) && isset($_SESSION['cart'][$_GET['remove']])) {
     exit;
 }
 
+// Handle Coupon Removal
+if (isset($_GET['remove_coupon'])) {
+    unset($_SESSION['coupon']);
+    $_SESSION['coupon_msg'] = ['type' => 'success', 'text' => 'Coupon removed.'];
+    header("Location: cart.php");
+    exit;
+}
+
+// Handle Coupon Application
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['apply_coupon'])) {
+    $code = strtoupper(trim($_POST['coupon_code']));
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND status = 'active' AND expiry_date >= CURRENT_DATE()");
+        $stmt->execute([$code]);
+        $coupon = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($coupon) {
+            $_SESSION['coupon'] = [
+                'id' => $coupon['id'],
+                'code' => $coupon['code'],
+                'discount' => (float)$coupon['discount']
+            ];
+            $_SESSION['coupon_msg'] = ['type' => 'success', 'text' => 'Coupon applied successfully!'];
+        } else {
+            $_SESSION['coupon_msg'] = ['type' => 'error', 'text' => 'Invalid or expired coupon code.'];
+        }
+    } catch(PDOException $e) {
+        $_SESSION['coupon_msg'] = ['type' => 'error', 'text' => 'Error applying coupon.'];
+    }
+    header("Location: cart.php");
+    exit;
+}
+
 // Handle Cart Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_cart'])) {
     if (isset($_POST['qty']) && is_array($_POST['qty'])) {
@@ -58,13 +91,31 @@ if (!empty($_SESSION['cart'])) {
 }
 
 $shipping = 15.00;
-$total = $subtotal > 0 ? $subtotal + $shipping : 0;
+$discount_amount = 0;
+
+if (isset($_SESSION['coupon']) && $subtotal > 0) {
+    $discount_amount = ($subtotal * $_SESSION['coupon']['discount']) / 100;
+}
+
+$total = $subtotal > 0 ? ($subtotal - $discount_amount) + $shipping : 0;
 ?>
 
 <main style="padding-top: 100px; background-color: var(--bg-color); min-height: 100vh;">
     
     <div class="container py-5" style="padding: 60px 20px;">
         <h1 style="font-size: 2.5rem; margin-bottom: 40px; text-align: center;">Shopping Cart</h1>
+
+        <?php if(isset($_SESSION['coupon_msg'])): ?>
+            <?php 
+                $cmsg = $_SESSION['coupon_msg']; 
+                $bg = $cmsg['type'] == 'success' ? '#eafaf1' : '#fdeaea';
+                $color = $cmsg['type'] == 'success' ? '#27ae60' : '#e74c3c';
+            ?>
+            <div style="background: <?php echo $bg; ?>; color: <?php echo $color; ?>; padding: 15px; border-radius: 5px; margin-bottom: 30px; border-left: 4px solid <?php echo $color; ?>;">
+                <?php echo htmlspecialchars($cmsg['text']); ?>
+            </div>
+            <?php unset($_SESSION['coupon_msg']); ?>
+        <?php endif; ?>
 
         <?php if(empty($cart_items)): ?>
             <div style="text-align: center; padding: 50px 0;">
@@ -73,10 +124,10 @@ $total = $subtotal > 0 ? $subtotal + $shipping : 0;
                 <a href="shop.php" class="btn-primary" style="margin-top: 20px;">Return to Shop</a>
             </div>
         <?php else: ?>
-            <form method="POST" action="cart.php" style="display: flex; flex-wrap: wrap; gap: 40px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 40px;">
                 
-                <!-- Cart Items List -->
-                <div style="flex: 2; min-width: 300px;">
+                <!-- Cart Items List (Wrapped in form for updating qty) -->
+                <form method="POST" action="cart.php" style="flex: 2; min-width: 300px;">
                     <div style="background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.02);">
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
@@ -119,19 +170,22 @@ $total = $subtotal > 0 ? $subtotal + $shipping : 0;
                         </table>
                     </div>
                     
-                    <div style="margin-top: 30px; display: flex; justify-content: space-between;">
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" placeholder="Coupon Code" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; outline: none;">
-                            <button type="button" class="btn-outline" style="padding: 10px 20px;">Apply</button>
-                        </div>
+                    <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
                         <button type="submit" name="update_cart" class="btn-outline" style="padding: 10px 20px;">Update Cart</button>
                     </div>
-                </div>
+                </form>
 
-                <!-- Order Summary -->
+                <!-- Order Summary Sidebar -->
                 <div style="flex: 1; min-width: 300px;">
-                    <div style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.02);">
+                    <div style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); position: sticky; top: 100px;">
                         <h3 style="margin-bottom: 25px; font-size: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 15px;">Order Summary</h3>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <form method="POST" action="cart.php" style="display: flex; gap: 10px;">
+                                <input type="text" name="coupon_code" placeholder="Coupon Code" required style="flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; outline: none; text-transform: uppercase;">
+                                <button type="submit" name="apply_coupon" class="btn-outline" style="padding: 10px 20px;">Apply</button>
+                            </form>
+                        </div>
                         
                         <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #666;">
                             <span>Subtotal</span>
@@ -141,6 +195,13 @@ $total = $subtotal > 0 ? $subtotal + $shipping : 0;
                             <span>Shipping</span>
                             <span>Rs. <?php echo number_format($shipping, 2); ?></span>
                         </div>
+
+                        <?php if(isset($_SESSION['coupon'])): ?>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #27ae60; font-weight: 600;">
+                            <span>Discount (<?php echo $_SESSION['coupon']['code']; ?> - <?php echo $_SESSION['coupon']['discount']; ?>%) <a href="cart.php?remove_coupon=1" style="color: #e74c3c; font-size: 0.8rem; margin-left: 5px;"><i class="fas fa-times"></i></a></span>
+                            <span>- Rs. <?php echo number_format($discount_amount, 2); ?></span>
+                        </div>
+                        <?php endif; ?>
                         
                         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
                         
@@ -157,7 +218,7 @@ $total = $subtotal > 0 ? $subtotal + $shipping : 0;
                     </div>
                 </div>
 
-            </form>
+            </div>
         <?php endif; ?>
     </div>
 </main>

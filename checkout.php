@@ -41,7 +41,13 @@ try {
 } catch(PDOException $e) {}
 
 $shipping = 150.00; // Rs. 150 shipping
-$total    = $subtotal + $shipping;
+$discount_amount = 0;
+
+if (isset($_SESSION['coupon']) && $subtotal > 0) {
+    $discount_amount = ($subtotal * $_SESSION['coupon']['discount']) / 100;
+}
+
+$total    = ($subtotal - $discount_amount) + $shipping;
 
 // Pre-fill form if user is logged in
 $user_name  = $_SESSION['user_name'] ?? '';
@@ -134,6 +140,14 @@ if (isset($_SESSION['user_id'])) {
                         <span>Subtotal</span>
                         <span>Rs. <?php echo number_format($subtotal, 2); ?></span>
                     </div>
+
+                    <?php if(isset($_SESSION['coupon'])): ?>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #27ae60; font-weight: 600;">
+                        <span>Discount (<?php echo $_SESSION['coupon']['code']; ?> - <?php echo $_SESSION['coupon']['discount']; ?>%)</span>
+                        <span>- Rs. <?php echo number_format($discount_amount, 2); ?></span>
+                    </div>
+                    <?php endif; ?>
+
                     <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                         <span>Shipping</span>
                         <span>Rs. <?php echo number_format($shipping, 2); ?></span>
