@@ -186,7 +186,6 @@ $user_role    = $is_logged_in ? $_SESSION['user_role'] : '';
     </nav>
 
     <div class="nav-icons">
-        <a href="#"><i class="fas fa-search"></i></a>
         <a href="wishlist.php"><i class="far fa-heart"></i></a>
 
         <!-- Cart Icon with count -->
@@ -237,8 +236,45 @@ $user_role    = $is_logged_in ? $_SESSION['user_role'] : '';
             <i class="far fa-user"></i>
         </a>
         <?php endif; ?>
+
+        <!-- Hamburger Button (mobile only) -->
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 </header>
+
+<!-- Mobile Navigation Overlay -->
+<div class="mobile-nav" id="mobileNav">
+    <ul>
+        <li><a href="home.php" onclick="closeMobileNav()">Home</a></li>
+        <li><a href="shop.php" onclick="closeMobileNav()">Shop</a></li>
+        <li><a href="shop.php?category=men" onclick="closeMobileNav()">Men</a></li>
+        <li><a href="shop.php?category=women" onclick="closeMobileNav()">Women</a></li>
+        <li><a href="shop.php?category=oud" onclick="closeMobileNav()">Oud</a></li>
+        <li><a href="contact.php" onclick="closeMobileNav()">Contact</a></li>
+        <?php if($is_logged_in): ?>
+        <li><a href="account.php" onclick="closeMobileNav()">My Account</a></li>
+        <?php if($user_role === 'admin'): ?>
+        <li><a href="admin/index.php" onclick="closeMobileNav()" style="color:var(--gold-color);">Admin Panel</a></li>
+        <?php endif; ?>
+        <li><a href="logout.php" style="color:#e74c3c;">Logout</a></li>
+        <?php else: ?>
+        <li><a href="index.php" onclick="closeMobileNav()">Login / Register</a></li>
+        <?php endif; ?>
+    </ul>
+    <div class="mobile-nav-icons">
+        <a href="wishlist.php"><i class="far fa-heart"></i></a>
+        <a href="cart.php" style="position:relative;">
+            <i class="fas fa-shopping-bag"></i>
+            <?php if($cart_count > 0): ?>
+            <span style="position:absolute;top:-8px;right:-8px;background:var(--gold-color);color:#fff;font-size:0.6rem;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><?php echo $cart_count; ?></span>
+            <?php endif; ?>
+        </a>
+    </div>
+</div>
 
 <script>
 function toggleUserMenu(e) {
@@ -246,9 +282,29 @@ function toggleUserMenu(e) {
     document.getElementById('userDropdown').classList.toggle('open');
 }
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function() {
     const dd = document.getElementById('userDropdown');
     if (dd) dd.classList.remove('open');
+});
+
+function toggleMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    const btn = document.getElementById('hamburgerBtn');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeMobileNav() {
+    const nav = document.getElementById('mobileNav');
+    const btn = document.getElementById('hamburgerBtn');
+    nav.classList.remove('open');
+    btn.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// Close mobile nav on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMobileNav();
 });
 </script>
