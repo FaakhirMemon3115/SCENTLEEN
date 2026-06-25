@@ -58,7 +58,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
         <a href="#"><i class="fas fa-users" style="width: 25px;"></i> Customers</a>
         <a href="#"><i class="fas fa-tags" style="width: 25px;"></i> Categories</a>
         <a href="#"><i class="fas fa-ticket-alt" style="width: 25px;"></i> Coupons</a>
-        <a href="#"><i class="fas fa-cog" style="width: 25px;"></i> Settings</a>
+        <a href="settings.php"><i class="fas fa-cog" style="width: 25px;"></i> Settings</a>
     </nav>
 </aside>
 

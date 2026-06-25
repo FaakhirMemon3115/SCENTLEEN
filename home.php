@@ -1,6 +1,27 @@
 <?php
-// index.php
+// home.php
+require_once 'config/database.php';
 require_once 'includes/header.php';
+
+// Fetch settings
+$settings = [];
+try {
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $settings[$row['setting_key']] = $row['setting_value'];
+    }
+} catch(PDOException $e) {}
+
+$hero_title = $settings['hero_title'] ?? 'SCENTLEEN';
+$hero_subtitle = $settings['hero_subtitle'] ?? 'The Art of Luxury Fragrance';
+$hero_image = $settings['hero_image'] ?? 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=2000&auto=format&fit=crop';
+
+// Fetch signature products
+$signature_products = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM products WHERE status = 'active' ORDER BY id DESC LIMIT 3");
+    $signature_products = $stmt->fetchAll();
+} catch(PDOException $e) {}
 ?>
 
 <!-- Main Content -->
@@ -10,12 +31,12 @@ require_once 'includes/header.php';
         <!-- Video Background Placeholder (since we don't have a real video asset yet) -->
         <div class="video-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: #111;">
             <!-- Real video tag should go here when asset is available -->
-            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=2000&auto=format&fit=crop" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: brightness(0.7);" alt="Hero Perfume Background">
+            <img src="<?php echo htmlspecialchars($hero_image); ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: brightness(0.7);" alt="Hero Perfume Background">
         </div>
         
         <div class="container hero-content text-center" style="z-index: 1;">
-            <p class="hero-subtitle fade-up" style="font-family: var(--font-body); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; color: var(--gold-color);">The Art of Luxury Fragrance</p>
-            <h1 class="hero-title fade-up" style="font-size: 5rem; margin-bottom: 30px; letter-spacing: 2px;">SCENTLEEN</h1>
+            <p class="hero-subtitle fade-up" style="font-family: var(--font-body); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; color: var(--gold-color);"><?php echo htmlspecialchars($hero_subtitle); ?></p>
+            <h1 class="hero-title fade-up" style="font-size: 5rem; margin-bottom: 30px; letter-spacing: 2px;"><?php echo htmlspecialchars($hero_title); ?></h1>
             <p class="hero-text fade-up" style="max-width: 600px; margin: 0 auto 40px; font-weight: 300;">Discover an exclusive collection of premium perfumes, authentic Arabian Oud, and imported masterpieces tailored for the modern connoisseur.</p>
             <div class="fade-up" style="transition-delay: 0.3s;">
                 <a href="shop.php" class="btn-primary" style="background-color: var(--gold-color); color: #fff; border-color: var(--gold-color);">Explore Collection</a>
@@ -80,27 +101,20 @@ require_once 'includes/header.php';
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
-                <!-- Product Card -->
-                <div class="glass product-card" style="padding: 30px; border-radius: 15px; text-align: center; color: #fff; transition: transform 0.4s ease, box-shadow 0.4s ease;">
-                    <img src="https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=400&auto=format&fit=crop" alt="Signature Perfume 1" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
-                    <h4 style="font-size: 1.5rem; margin-bottom: 10px;">Royal Majesty</h4>
-                    <p style="color: var(--gold-color); font-size: 1.2rem; margin-bottom: 15px;">$240.00</p>
-                    <a href="#" class="btn-outline" style="color: #fff; border-color: #fff; width: 100%;">Add to Cart</a>
-                </div>
-                <!-- Product Card -->
-                <div class="glass product-card" style="padding: 30px; border-radius: 15px; text-align: center; color: #fff; transition: transform 0.4s ease, box-shadow 0.4s ease;">
-                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=400&auto=format&fit=crop" alt="Signature Perfume 2" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
-                    <h4 style="font-size: 1.5rem; margin-bottom: 10px;">Midnight Oud</h4>
-                    <p style="color: var(--gold-color); font-size: 1.2rem; margin-bottom: 15px;">$310.00</p>
-                    <a href="#" class="btn-outline" style="color: #fff; border-color: #fff; width: 100%;">Add to Cart</a>
-                </div>
-                <!-- Product Card -->
-                <div class="glass product-card" style="padding: 30px; border-radius: 15px; text-align: center; color: #fff; transition: transform 0.4s ease, box-shadow 0.4s ease;">
-                    <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=400&auto=format&fit=crop" alt="Signature Perfume 3" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
-                    <h4 style="font-size: 1.5rem; margin-bottom: 10px;">Golden Elixir</h4>
-                    <p style="color: var(--gold-color); font-size: 1.2rem; margin-bottom: 15px;">$280.00</p>
-                    <a href="#" class="btn-outline" style="color: #fff; border-color: #fff; width: 100%;">Add to Cart</a>
-                </div>
+                <?php if(!empty($signature_products)): ?>
+                    <?php foreach($signature_products as $p): ?>
+                    <!-- Product Card -->
+                    <div class="glass product-card" style="padding: 30px; border-radius: 15px; text-align: center; color: #fff; transition: transform 0.4s ease, box-shadow 0.4s ease;">
+                        <?php $p_img = $p['image'] ? 'uploads/'.$p['image'] : 'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=400&auto=format&fit=crop'; ?>
+                        <img src="<?php echo htmlspecialchars($p_img); ?>" alt="<?php echo htmlspecialchars($p['name']); ?>" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="font-size: 1.5rem; margin-bottom: 10px;"><a href="product.php?slug=<?php echo urlencode($p['slug']); ?>" style="color: #fff;"><?php echo htmlspecialchars($p['name']); ?></a></h4>
+                        <p style="color: var(--gold-color); font-size: 1.2rem; margin-bottom: 15px;">Rs. <?php echo number_format($p['price'], 2); ?></p>
+                        <button onclick="addToCart(<?php echo $p['id']; ?>)" class="btn-outline" style="color: #fff; border-color: #fff; width: 100%;">Add to Cart</button>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color: #fff; text-align: center; width: 100%;">No signature products found.</p>
+                <?php endif; ?>
             </div>
         </div>
     </section>
