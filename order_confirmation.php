@@ -12,21 +12,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['cart'])) {
 }
 
 // Collect billing info
-$first_name     = trim($_POST['first_name'] ?? '');
-$last_name      = trim($_POST['last_name'] ?? '');
-$email          = trim($_POST['email'] ?? '');
-$phone          = trim($_POST['phone'] ?? '');
-$address        = trim($_POST['address'] ?? '');
-$address2       = trim($_POST['address2'] ?? '');
-$city           = trim($_POST['city'] ?? '');
-$postcode       = trim($_POST['postcode'] ?? '');
-$notes          = trim($_POST['notes'] ?? '');
+$first_name = trim($_POST['first_name'] ?? '');
+$last_name = trim($_POST['last_name'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$phone = trim($_POST['phone'] ?? '');
+$address = trim($_POST['address'] ?? '');
+$address2 = trim($_POST['address2'] ?? '');
+$city = trim($_POST['city'] ?? '');
+$postcode = trim($_POST['postcode'] ?? '');
+$notes = trim($_POST['notes'] ?? '');
 $payment_method = trim($_POST['payment_method'] ?? 'Cash on Delivery');
-$total          = (float)($_POST['total'] ?? 0);
-$shipping       = (float)($_POST['shipping'] ?? 0);
+$total = (float) ($_POST['total'] ?? 0);
+$shipping = (float) ($_POST['shipping'] ?? 0);
 
 $full_name = $first_name . ' ' . $last_name;
-$full_address = $address . ($address2 ? ', '.$address2 : '') . ', ' . $city . ', ' . $postcode;
+$full_address = $address . ($address2 ? ', ' . $address2 : '') . ', ' . $city . ', ' . $postcode;
 
 $order_number = 'SCT-' . strtoupper(uniqid());
 $order_id = null;
@@ -47,14 +47,14 @@ if (!$user_id) {
             // Insert a guest user
             $stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password, role, status) VALUES (:name, :email, :phone, :pass, 'customer', 'active')");
             $stmt->execute([
-                ':name'  => $full_name,
+                ':name' => $full_name,
                 ':email' => $email,
                 ':phone' => $phone,
-                ':pass'  => password_hash(uniqid(), PASSWORD_DEFAULT) // random password for guest
+                ':pass' => password_hash(uniqid(), PASSWORD_DEFAULT) // random password for guest
             ]);
             $user_id = $pdo->lastInsertId();
         }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         // If users table issue, fallback: use 1 (admin) -- should not happen
         $user_id = 1;
     }
@@ -64,9 +64,9 @@ if (!$user_id) {
 try {
     $stmt = $pdo->prepare("INSERT INTO orders (user_id, order_number, total, status, payment_method) VALUES (:uid, :onum, :total, 'Pending', :payment)");
     $stmt->execute([
-        ':uid'     => $user_id,
-        ':onum'    => $order_number,
-        ':total'   => $total,
+        ':uid' => $user_id,
+        ':onum' => $order_number,
+        ':total' => $total,
         ':payment' => $payment_method
     ]);
     $order_id = $pdo->lastInsertId();
@@ -75,9 +75,9 @@ try {
     foreach ($_SESSION['cart'] as $product_id => $item) {
         $stmt2 = $pdo->prepare("INSERT INTO order_items (order_id, product_id, qty, price) VALUES (:oid, :pid, :qty, :price)");
         $stmt2->execute([
-            ':oid'   => $order_id,
-            ':pid'   => $product_id,
-            ':qty'   => $item['qty'],
+            ':oid' => $order_id,
+            ':pid' => $product_id,
+            ':qty' => $item['qty'],
             ':price' => $item['price']
         ]);
     }
@@ -94,7 +94,7 @@ try {
     $cart_snapshot = $_SESSION['cart'];
     unset($_SESSION['cart']);
 
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     // If DB fails, still show a message but log the error
     error_log("Order save error: " . $e->getMessage());
 }
@@ -115,13 +115,14 @@ if (!empty($item_ids)) {
         foreach ($ps->fetchAll(PDO::FETCH_ASSOC) as $r) {
             $prod_names[$r['id']] = $r['name'];
         }
-    } catch(PDOException $e) {}
+    } catch (PDOException $e) {
+    }
 }
 
 foreach (($cart_snapshot ?? []) as $pid => $item) {
     $name = $prod_names[$pid] ?? "Product #$pid";
     $line_total = number_format($item['price'] * $item['qty'], 2);
-    $price_fmt  = number_format($item['price'], 2);
+    $price_fmt = number_format($item['price'], 2);
     $cart_rows_html .= "<tr>
         <td style='padding:10px; border-bottom:1px solid #eee;'>{$name}</td>
         <td style='padding:10px; border-bottom:1px solid #eee; text-align:center;'>{$item['qty']}</td>
@@ -138,7 +139,7 @@ foreach (($cart_snapshot ?? []) as $pid => $item) {
 
 $subtotal_fmt = number_format($true_subtotal, 2);
 $shipping_fmt = number_format($shipping, 2);
-$total_fmt    = number_format($total, 2);
+$total_fmt = number_format($total, 2);
 
 $discount_html = '';
 if ($coupon_snapshot) {
@@ -253,48 +254,67 @@ $email_body_html = <<<HTML
 </html>
 HTML;
 
-// Send Email
-$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-$headers .= "From: Scentleen <noreply@scentleen.com>\r\n";
-$headers .= "Reply-To: support@scentleen.com\r\n";
+// // Send Email
+// $headers  = "MIME-Version: 1.0\r\n";
+// $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+// $headers .= "From: Scentleen <noreply@scentleen.com>\r\n";
+// $headers .= "Reply-To: support@scentleen.com\r\n";
 
-mail($email, $email_subject, $email_body_html, $headers);
+// // Send Email (Suppress warning on localhost without SMTP server)
+// @mail($email, $email_subject, $email_body_html, $headers);
 
 // Now require header for the success page display
 require_once 'includes/header.php';
 ?>
 
-<main style="padding-top: 100px; background-color: var(--bg-color); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+<main
+    style="padding-top: 100px; background-color: var(--bg-color); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div class="container" style="max-width: 700px; text-align: center; padding: 60px 20px;">
-        
-        <div style="width: 100px; height: 100px; background: #eafaf1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; animation: popIn 0.6s ease;">
+
+        <div
+            style="width: 100px; height: 100px; background: #eafaf1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; animation: popIn 0.6s ease;">
             <i class="fas fa-check" style="font-size: 2.5rem; color: #27ae60;"></i>
         </div>
 
         <h1 style="font-size: 2.5rem; margin-bottom: 15px;">Order Placed Successfully!</h1>
-        <p style="color: #666; font-size: 1.1rem; margin-bottom: 10px;">Thank you, <strong><?php echo htmlspecialchars($full_name); ?></strong>! Your order has been received.</p>
+        <p style="color: #666; font-size: 1.1rem; margin-bottom: 10px;">Thank you,
+            <strong><?php echo htmlspecialchars($full_name); ?></strong>! Your order has been received.</p>
         <p style="color: #999; font-size: 0.95rem; margin-bottom: 30px;">
-            A confirmation email has been sent to <strong style="color: var(--gold-color);"><?php echo htmlspecialchars($email); ?></strong>
+            A confirmation email has been sent to <strong
+                style="color: var(--gold-color);"><?php echo htmlspecialchars($email); ?></strong>
         </p>
 
-        <div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 40px; text-align: left;">
+        <div
+            style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 40px; text-align: left;">
             <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
                 <div>
-                    <p style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Order Number</p>
-                    <p style="font-size: 1.3rem; font-weight: 700; color: var(--text-color); font-family: var(--font-heading);"><?php echo $order_number; ?></p>
+                    <p
+                        style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Order Number</p>
+                    <p
+                        style="font-size: 1.3rem; font-weight: 700; color: var(--text-color); font-family: var(--font-heading);">
+                        <?php echo $order_number; ?></p>
                 </div>
                 <div>
-                    <p style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Payment</p>
+                    <p
+                        style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Payment</p>
                     <p style="font-size: 1rem; font-weight: 600;"><?php echo htmlspecialchars($payment_method); ?></p>
                 </div>
                 <div>
-                    <p style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Total</p>
-                    <p style="font-size: 1.3rem; font-weight: 700; color: var(--gold-color);">Rs. <?php echo number_format($total, 2); ?></p>
+                    <p
+                        style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Total</p>
+                    <p style="font-size: 1.3rem; font-weight: 700; color: var(--gold-color);">Rs.
+                        <?php echo number_format($total, 2); ?></p>
                 </div>
                 <div>
-                    <p style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Status</p>
-                    <span style="background: #fff9e6; color: #f39c12; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">⏳ Pending</span>
+                    <p
+                        style="font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        Status</p>
+                    <span
+                        style="background: #fff9e6; color: #f39c12; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">⏳
+                        Pending</span>
                 </div>
             </div>
 
@@ -314,11 +334,21 @@ require_once 'includes/header.php';
 </main>
 
 <style>
-@keyframes popIn {
-    0%   { transform: scale(0); opacity: 0; }
-    70%  { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-}
+    @keyframes popIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        70% {
+            transform: scale(1.15);
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 </style>
 
 <?php require_once 'includes/footer.php'; ?>

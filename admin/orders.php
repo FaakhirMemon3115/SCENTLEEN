@@ -1,8 +1,6 @@
 <?php
 // admin/orders.php
 require_once '../config/database.php';
-require_once 'includes/header.php';
-
 // Handle Status Update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $order_id  = (int)$_POST['order_id'];
@@ -17,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     header("Location: orders.php?updated=1");
     exit;
 }
+
+require_once 'includes/header.php';
 
 // Fetch orders with customer name and item count
 try {
