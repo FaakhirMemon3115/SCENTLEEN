@@ -1,21 +1,28 @@
-/* assets/css/style.css */
+/* ============================================================
+   assets/css/style.css  —  Scentleen Global Stylesheet
+   Breakpoints:
+     xs  : < 480px    (small phones)
+     sm  : 480-767px  (phones)
+     md  : 768-1023px (tablets / iPads)
+     lg  : 1024-1279px (laptops / small desktops)
+     xl  : 1280px+    (desktops / Macs)
+   ============================================================ */
 
+/* ── CSS Variables ── */
 :root {
-    --bg-color: #FAF8F4;
-    --secondary-color: #F3EBDD;
-    --gold-color: #C9A96E;
-    --text-color: #2D2D2D;
-    --hover-color: #B88A44;
-    
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Inter', sans-serif;
+    --bg-color:       #FAF8F4;
+    --secondary-color:#F3EBDD;
+    --gold-color:     #C9A96E;
+    --hover-color:    #B88A44;
+    --text-color:     #2D2D2D;
+    --font-heading:   'Playfair Display', serif;
+    --font-body:      'Inter', sans-serif;
+    --header-h:       80px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
     background-color: var(--bg-color);
@@ -25,9 +32,12 @@ body {
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
+img { max-width: 100%; display: block; }
+
+h1,h2,h3,h4,h5,h6 {
     font-family: var(--font-heading);
     font-weight: 600;
+    line-height: 1.3;
 }
 
 a {
@@ -35,19 +45,29 @@ a {
     text-decoration: none;
     transition: color 0.3s ease;
 }
+a:hover { color: var(--hover-color); }
 
-a:hover {
-    color: var(--hover-color);
+/* ── Utility ── */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5%;
 }
 
-.text-gold {
-    color: var(--gold-color);
+section { padding: 100px 0; }
+
+.section-title {
+    text-align: center;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    margin-bottom: 50px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.bg-secondary {
-    background-color: var(--secondary-color);
-}
+.text-gold  { color: var(--gold-color); }
+.bg-secondary { background-color: var(--secondary-color); }
 
+/* ── Buttons ── */
 .btn-primary {
     display: inline-block;
     background-color: var(--text-color);
@@ -59,8 +79,9 @@ a:hover {
     letter-spacing: 1px;
     transition: all 0.3s ease;
     border: 1px solid var(--text-color);
+    cursor: pointer;
+    border-radius: 3px;
 }
-
 .btn-primary:hover {
     background-color: var(--hover-color);
     color: #fff;
@@ -78,37 +99,52 @@ a:hover {
     letter-spacing: 1px;
     transition: all 0.3s ease;
     border: 1px solid var(--text-color);
+    cursor: pointer;
+    border-radius: 3px;
 }
-
 .btn-outline:hover {
     background-color: var(--text-color);
     color: var(--bg-color);
 }
 
-/* Navbar */
-header {
+/* ── Glassmorphism ── */
+.glass {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* ── Animations ── */
+.fade-up { opacity: 0; transform: translateY(30px); }
+
+/* ============================================================
+   HEADER / NAVBAR
+   ============================================================ */
+header#main-header {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     width: 100%;
-    z-index: 100;
-    padding: 20px 5%;
+    z-index: 1000;
+    padding: 18px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.3s ease, padding 0.3s ease;
+    transition: background 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
 }
 
-header.scrolled {
-    background-color: rgba(250, 248, 244, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 15px 5%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+header#main-header.scrolled {
+    background-color: rgba(250,248,244,0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 5%;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.07);
 }
 
+/* Logo */
 .logo {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -116,81 +152,390 @@ header.scrolled {
     flex-direction: column;
     align-items: center;
     line-height: 1;
+    z-index: 1010;
 }
+.logo a { display: flex; flex-direction: column; align-items: center; }
 .logo-sub {
     font-size: 0.6rem;
     letter-spacing: 3px;
     font-family: var(--font-body);
-    margin-top: 5px;
+    margin-top: 4px;
     color: var(--gold-color);
 }
 
+/* Desktop Nav */
 nav ul {
     list-style: none;
     display: flex;
-    gap: 30px;
+    gap: 28px;
 }
-
 nav ul li a {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     position: relative;
+    padding: 4px 0;
 }
-
 nav ul li a::after {
     content: '';
     position: absolute;
-    bottom: -5px;
-    left: 0;
+    bottom: -3px; left: 0;
     width: 0%;
     height: 1px;
     background-color: var(--gold-color);
     transition: width 0.3s ease;
 }
+nav ul li a:hover::after { width: 100%; }
 
-nav ul li a:hover::after {
-    width: 100%;
-}
-
+/* Nav Icons */
 .nav-icons {
     display: flex;
-    gap: 20px;
+    gap: 18px;
+    align-items: center;
+}
+.nav-icons a { font-size: 1.15rem; }
+
+/* Cart badge */
+.cart-icon-wrapper { position: relative; display: inline-flex; }
+.cart-count-badge {
+    position: absolute;
+    top: -7px; right: -8px;
+    background: var(--gold-color);
+    color: #fff;
+    font-size: 0.58rem;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
 }
 
-.nav-icons a {
-    font-size: 1.2rem;
+/* ── User Dropdown ── */
+.user-menu-wrapper { position: relative; }
+.user-menu-trigger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
 }
-
-/* Utility */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+.user-menu-trigger .user-initial {
+    width: 30px; height: 30px;
+    background: var(--gold-color);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
 }
-
-section {
-    padding: 100px 0;
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 14px);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    min-width: 220px;
+    z-index: 1100;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
 }
+.user-dropdown.open { display: block; }
+.user-dropdown-header {
+    background: var(--text-color);
+    padding: 16px 18px;
+    color: #fff;
+}
+.user-dropdown-header .user-name { font-weight: 600; font-size: 0.95rem; font-family: var(--font-heading); }
+.user-dropdown-header .user-role-badge { font-size: 0.7rem; color: var(--gold-color); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.user-dropdown a, .user-dropdown form button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    color: #444;
+    text-decoration: none;
+    transition: background 0.2s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--font-body);
+}
+.user-dropdown a:hover, .user-dropdown form button:hover { background: #f9f6f1; color: var(--gold-color); }
+.user-dropdown a i, .user-dropdown form button i { width: 16px; color: var(--gold-color); font-size: 0.85rem; }
+.user-dropdown .divider-line { height: 1px; background: #eee; margin: 4px 0; }
+.user-dropdown .logout-btn { color: #e74c3c !important; }
+.user-dropdown .logout-btn i { color: #e74c3c !important; }
+.user-dropdown .logout-btn:hover { background: #fdeaea !important; }
 
-.section-title {
+/* ── Hamburger Menu ── */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+    z-index: 1010;
+}
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text-color);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* Mobile Nav Overlay */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--text-color);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav ul {
+    list-style: none;
     text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 50px;
+    width: 100%;
+}
+.mobile-nav ul li { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.mobile-nav ul li a {
+    display: block;
+    padding: 18px 30px;
+    font-size: 1.1rem;
     text-transform: uppercase;
     letter-spacing: 2px;
+    color: #fff;
+    transition: color 0.3s, background 0.3s;
+}
+.mobile-nav ul li a:hover { color: var(--gold-color); background: rgba(255,255,255,0.05); }
+.mobile-nav .mobile-nav-icons {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.mobile-nav .mobile-nav-icons a { color: #fff; font-size: 1.3rem; }
+.mobile-nav .mobile-nav-icons a:hover { color: var(--gold-color); }
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* ── Large Tablets / Small Laptops: 768px – 1023px ── */
+@media (max-width: 1023px) {
+    :root { --header-h: 70px; }
+
+    header#main-header { padding: 15px 5%; }
+
+    nav { display: none; }  /* hide desktop nav, use hamburger */
+    .hamburger { display: flex; }
+
+    .section-title { font-size: 2rem; margin-bottom: 35px; }
+    section { padding: 70px 0; }
+
+    .container { padding: 0 5%; }
 }
 
-/* Glassmorphism */
-.glass {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+/* ── Tablets / iPads: 768px – 1023px ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .logo { font-size: 1.5rem; }
+    .nav-icons { gap: 16px; }
+    .nav-icons a { font-size: 1.1rem; }
 }
 
-/* Animations */
-.fade-up {
-    opacity: 0;
-    transform: translateY(30px);
+/* ── Mobile: < 768px ── */
+@media (max-width: 767px) {
+    :root { --header-h: 65px; }
+
+    header#main-header { padding: 12px 5%; }
+
+    .logo { font-size: 1.3rem; }
+
+    .nav-icons { gap: 14px; }
+    .nav-icons a { font-size: 1.05rem; }
+
+    /* Buttons full width on small screens where needed */
+    .btn-primary,
+    .btn-outline { padding: 11px 22px; font-size: 0.82rem; }
+
+    section { padding: 50px 0; }
+    .section-title { font-size: 1.6rem; letter-spacing: 1px; margin-bottom: 25px; }
+
+    .container { padding: 0 4%; }
+
+    /* User dropdown stays right-aligned */
+    .user-dropdown { min-width: 190px; }
+}
+
+/* ── Small Phones: < 480px ── */
+@media (max-width: 479px) {
+    .logo { font-size: 1.1rem; }
+    .nav-icons { gap: 10px; }
+    .nav-icons a { font-size: 1rem; }
+    .user-menu-trigger .user-initial { width: 26px; height: 26px; font-size: 0.7rem; }
+}
+
+/* ============================================================
+   SHOP / PRODUCT GRID
+   ============================================================ */
+.product-grid,
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+@media (max-width: 767px) {
+    .product-grid,
+    .shop-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 479px) {
+    .product-grid,
+    .shop-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* ============================================================
+   CART PAGE
+   ============================================================ */
+@media (max-width: 767px) {
+    /* Cart table: hide price column, show qty and total */
+    .cart-table thead tr th:nth-child(2),
+    .cart-table tbody tr td:nth-child(2) { display: none; }
+}
+
+/* ============================================================
+   CHECKOUT — two column → single column
+   ============================================================ */
+@media (max-width: 900px) {
+    /* checkout.php uses flex; min-width already handles collapse */
+    .checkout-grid { flex-direction: column !important; }
+}
+
+/* ============================================================
+   ACCOUNT PAGE SIDEBAR
+   ============================================================ */
+@media (max-width: 767px) {
+    .account-layout { flex-direction: column !important; }
+    .account-sidebar { width: 100% !important; }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+@media (max-width: 767px) {
+    footer .container > div { min-width: calc(50% - 15px) !important; }
+    footer { padding: 40px 5% 20px !important; }
+}
+
+@media (max-width: 479px) {
+    footer .container > div { min-width: 100% !important; }
+}
+
+/* ============================================================
+   HERO SECTION RESPONSIVE
+   ============================================================ */
+@media (max-width: 767px) {
+    .hero-section { height: 90vh !important; }
+    .hero-section h1 { font-size: clamp(2rem, 10vw, 4rem) !important; }
+    .hero-section p  { font-size: 0.9rem !important; }
+}
+
+/* ============================================================
+   COLLECTION CARDS
+   ============================================================ */
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+@media (max-width: 767px) {
+    .collection-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   PRODUCT DETAIL PAGE
+   ============================================================ */
+@media (max-width: 767px) {
+    .product-detail-layout {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+    .product-thumbnails {
+        flex-direction: row !important;
+        overflow-x: auto;
+    }
+}
+
+/* ============================================================
+   SHOP FILTER SIDEBAR
+   ============================================================ */
+@media (max-width: 900px) {
+    .shop-layout { flex-direction: column !important; }
+    .shop-sidebar { width: 100% !important; display: none; }
+    .shop-sidebar.open { display: block; }
+    .filter-toggle-btn { display: block !important; }
+}
+
+/* ============================================================
+   ADMIN PANEL RESPONSIVE
+   ============================================================ */
+@media (max-width: 991px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0 !important; width: 100% !important; }
+    .admin-toggle-btn { display: flex !important; }
+    .sidebar-overlay { display: block !important; }
+}
+
+@media (max-width: 767px) {
+    .admin-header h2 { font-size: 1.1rem !important; }
+    .admin-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .admin-table th, .admin-table td { padding: 10px 8px !important; font-size: 0.8rem !important; }
+}
+
+@media (max-width: 479px) {
+    .admin-stats-grid { grid-template-columns: 1fr !important; }
+    .admin-table thead { display: none; }
+    .admin-table tr { display: block; border-bottom: 2px solid #eee; margin-bottom: 10px; }
+    .admin-table td { display: flex; justify-content: space-between; padding: 8px 12px !important; }
+    .admin-table td::before { content: attr(data-label); font-weight: 600; color: #999; font-size: 0.75rem; text-transform: uppercase; }
 }
