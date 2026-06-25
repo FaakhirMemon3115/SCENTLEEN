@@ -53,10 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div style="background: #fff; padding: 50px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); width: 100%; max-width: 500px; margin: 40px 20px;">
         
         <div class="text-center mb-4">
-            <a href="home.php" style="display: inline-block; padding: 20px; border: 2px solid var(--gold-color); border-radius: 10px; margin-bottom: 30px;">
+            <div style="display: inline-block; padding: 20px; border: 2px solid var(--gold-color); border-radius: 10px; margin-bottom: 30px;">
                 <span style="font-size: 3rem; line-height: 0.8; display: block; font-family: var(--font-heading); margin-bottom: 5px; color: var(--text-color);">$</span>
                 <span style="font-size: 1.5rem; letter-spacing: 3px; font-family: var(--font-heading); color: var(--text-color);">SCENTLEEN</span>
-            </a>
+            </div>
             <h2 style="font-size: 1.8rem; margin-bottom: 10px;">Welcome Back</h2>
             <p style="color: #666; font-size: 0.9rem;">Please sign in to your account</p>
         </div>
