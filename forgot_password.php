@@ -31,10 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             $success = "A password reset link has been sent to your email address.";
             
-            // Since we are on localhost without SMTP, generate a demo link to show on screen
+            // In a real production environment, you would use mail() or a library like PHPMailer here to email the $token to the user.
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $base_url  = $protocol . '://' . $_SERVER['HTTP_HOST'] . '/SCENTLEEN/';
-            $demo_link = $base_url . "reset_password.php?token=" . $token;
+            $reset_link = $base_url . "reset_password.php?token=" . $token;
+            
+            $subject = "Scentleen - Password Reset";
+            $message = "Click here to reset your password: " . $reset_link;
+            $headers = "From: noreply@scentleen.com";
+            
+            @mail($email, $subject, $message, $headers);
             
         } else {
             // For security, do not reveal if an email exists or not. Show same success message.
@@ -229,15 +235,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             <?php if ($success): ?>
                 <div class="alert-success"><i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?></div>
-                
-                <?php if ($demo_link): ?>
-                    <!-- LOCALHOST DEMO LINK -->
-                    <div class="demo-box">
-                        <p style="font-size:0.85rem; color:#f39c12; margin-bottom:10px;"><i class="fas fa-info-circle"></i> Local Environment Demo</p>
-                        <a href="<?php echo htmlspecialchars($demo_link); ?>" style="display:inline-block; background:#f39c12; color:#fff; text-decoration:none; padding:10px 20px; border-radius:5px; font-weight:600;">Click to Reset Password</a>
-                    </div>
-                <?php endif; ?>
-                
             <?php else: ?>
                 <form method="POST" action="">
                     <div class="form-group">
