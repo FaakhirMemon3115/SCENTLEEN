@@ -13,9 +13,26 @@ try {
 } catch (PDOException $e) {
 }
 
-$hero_title = $settings['hero_title'] ?? 'SCENTLEEN';
+$hero_title    = $settings['hero_title']    ?? 'SCENTLEEN';
 $hero_subtitle = $settings['hero_subtitle'] ?? 'The Art of Luxury Fragrance';
-$hero_image = $settings['hero_image'] ?? 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=2000&auto=format&fit=crop';
+$hero_image    = $settings['hero_image']    ?? 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=2000&auto=format&fit=crop';
+$about_image   = $settings['about_image']   ?? '';
+
+// Fetch active categories for collections section
+$collections = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM categories WHERE status = 'active' ORDER BY id ASC");
+    $collections = $stmt->fetchAll();
+} catch (PDOException $e) {
+}
+
+// Default fallback collection cards (used only if no categories in DB)
+$default_collections = [
+    ['name' => 'Men',            'slug' => 'men',    'image' => 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=600&auto=format&fit=crop'],
+    ['name' => 'Women',          'slug' => 'women',  'image' => 'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=600&auto=format&fit=crop'],
+    ['name' => 'Arabian Oud',    'slug' => 'oud',    'image' => 'https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=600&auto=format&fit=crop'],
+    ['name' => 'Luxury Collection','slug' => 'luxury','image' => 'https://images.unsplash.com/photo-1622618991746-fe6004db3a47?q=80&w=600&auto=format&fit=crop'],
+];
 
 // Fetch signature products
 $signature_products = [];
@@ -70,55 +87,34 @@ try {
         <div class="container">
             <h2 class="section-title text-center" data-aos="fade-up">Our Collections</h2>
             <div class="collection-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px;">
 
-                <!-- Collection Card: Men -->
-                <a href="shop.php?category=men" class="collection-card" data-aos="fade-up" data-aos-delay="100"
-                    style="position: relative; overflow: hidden; border-radius: 10px; height: 350px; display: block;">
-                    <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=600&auto=format&fit=crop"
-                        alt="Men's Collection"
-                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;">
-                    <div class="collection-overlay"
-                        style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 30px;">
-                        <h3 style="color: #fff; font-size: 1.5rem; letter-spacing: 1px;">Men</h3>
+                <?php
+                $display_collections = !empty($collections) ? $collections : $default_collections;
+                $delays = [100, 200, 300, 400, 500, 600];
+                foreach ($display_collections as $i => $col):
+                    // Build the card image src
+                    if (!empty($col['image'])) {
+                        // DB category — image stored as relative path OR full URL
+                        $col_img = (strpos($col['image'], 'http') === 0) ? $col['image'] : $col['image'];
+                    } else {
+                        $col_img = 'https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=600&auto=format&fit=crop';
+                    }
+                    // Build shop link
+                    $col_slug = isset($col['slug']) ? $col['slug'] : strtolower(preg_replace('/[^a-z0-9]+/i', '-', $col['name']));
+                    $delay = $delays[$i] ?? (($i + 1) * 100);
+                ?>
+                <a href="shop.php?category=<?php echo urlencode($col_slug); ?>" class="collection-card" data-aos="fade-up" data-aos-delay="<?php echo $delay; ?>">
+                    <img src="<?php echo htmlspecialchars($col_img); ?>"
+                        alt="<?php echo htmlspecialchars($col['name']); ?> Collection">
+                    <div class="collection-overlay">
+                        <div class="collection-info">
+                            <h3><?php echo htmlspecialchars($col['name']); ?></h3>
+                            <span class="collection-cta">Explore <i class="fas fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </a>
-
-                <!-- Collection Card: Women -->
-                <a href="shop.php?category=women" class="collection-card" data-aos="fade-up" data-aos-delay="200"
-                    style="position: relative; overflow: hidden; border-radius: 10px; height: 350px; display: block;">
-                    <img src="https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=600&auto=format&fit=crop"
-                        alt="Women's Collection"
-                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;">
-                    <div class="collection-overlay"
-                        style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 30px;">
-                        <h3 style="color: #fff; font-size: 1.5rem; letter-spacing: 1px;">Women</h3>
-                    </div>
-                </a>
-
-                <!-- Collection Card: Arabian Oud -->
-                <a href="shop.php?category=oud" class="collection-card" data-aos="fade-up" data-aos-delay="300"
-                    style="position: relative; overflow: hidden; border-radius: 10px; height: 350px; display: block;">
-                    <img src="https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=600&auto=format&fit=crop"
-                        alt="Arabian Oud"
-                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;">
-                    <div class="collection-overlay"
-                        style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 30px;">
-                        <h3 style="color: #fff; font-size: 1.5rem; letter-spacing: 1px;">Arabian Oud</h3>
-                    </div>
-                </a>
-
-                <!-- Collection Card: Luxury -->
-                <a href="shop.php?category=luxury" class="collection-card" data-aos="fade-up" data-aos-delay="400"
-                    style="position: relative; overflow: hidden; border-radius: 10px; height: 350px; display: block;">
-                    <img src="https://images.unsplash.com/photo-1622618991746-fe6004db3a47?q=80&w=600&auto=format&fit=crop"
-                        alt="Luxury Collection"
-                        style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;">
-                    <div class="collection-overlay"
-                        style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 30px;">
-                        <h3 style="color: #fff; font-size: 1.5rem; letter-spacing: 1px;">Luxury Collection</h3>
-                    </div>
-                </a>
+                <?php endforeach; ?>
 
             </div>
         </div>
@@ -189,18 +185,28 @@ try {
                     </div>
                 </div>
             </div>
+
+            <!-- About Image: loaded from admin settings, or a beautiful default -->
             <div style="flex: 1; min-width: 300px; text-align: center;" data-aos="fade-left">
-                <!-- Using Logo Style text instead of image for now -->
-                <div
-                    style="display: inline-block; padding: 40px; border: 2px solid var(--gold-color); border-radius: 10px;">
-                    <span
-                        style="font-size: 5rem; line-height: 0.8; display: block; font-family: var(--font-heading); margin-bottom: 10px;">$</span>
-                    <span
-                        style="font-size: 2rem; letter-spacing: 5px; font-family: var(--font-heading);">SCENTLEEN</span>
-                    <p
-                        style="color: var(--gold-color); letter-spacing: 2px; font-size: 0.8rem; margin-top: 10px; text-transform: uppercase;">
-                        Paris · Est. 1980</p>
-                </div>
+                <?php if (!empty($about_image)): ?>
+                    <div class="about-img-wrap">
+                        <img src="<?php echo htmlspecialchars($about_image); ?>"
+                            alt="Scentleen - The Art of Luxury"
+                            style="width: 100%; max-width: 420px; height: 360px; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+                    </div>
+                <?php else: ?>
+                    <!-- Default: branded perfume image -->
+                    <div class="about-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop"
+                            alt="Scentleen Luxury Fragrance"
+                            style="width: 100%; max-width: 420px; height: 360px; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+                        <div style="margin-top: 20px; display: inline-flex; align-items: center; gap: 10px; color: var(--gold-color); font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;">
+                            <span style="width: 30px; height: 1px; background: var(--gold-color); display: inline-block;"></span>
+                            Paris · Est. 1980
+                            <span style="width: 30px; height: 1px; background: var(--gold-color); display: inline-block;"></span>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -278,44 +284,150 @@ try {
 </main>
 
 <style>
-    /* Index Specific Styles to enhance main.css */
+    /* Home Page Specific Styles */
     @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+        40% { transform: translateY(-15px) translateX(-50%); }
+        60% { transform: translateY(-7px) translateX(-50%); }
+    }
 
-        0%,
-        20%,
-        50%,
-        80%,
-        100% {
-            transform: translateY(0) translateX(-50%);
-        }
+    /* ============================
+       COLLECTION CARD HOVER EFFECTS
+       ============================ */
+    .collection-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        height: 360px;
+        display: block;
+        text-decoration: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        transition: box-shadow 0.4s ease, transform 0.4s ease;
+    }
 
-        40% {
-            transform: translateY(-15px) translateX(-50%);
-        }
+    .collection-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        display: block;
+    }
 
-        60% {
-            transform: translateY(-7px) translateX(-50%);
-        }
+    .collection-card:hover {
+        box-shadow: 0 16px 50px rgba(0,0,0,0.28);
+        transform: translateY(-6px);
     }
 
     .collection-card:hover img {
-        transform: scale(1.1);
+        transform: scale(1.12);
     }
 
+    .collection-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 55%, transparent 100%);
+        display: flex;
+        align-items: flex-end;
+        padding: 28px 30px;
+        transition: background 0.4s ease;
+    }
+
+    .collection-card:hover .collection-overlay {
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+    }
+
+    .collection-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .collection-info h3 {
+        color: #fff;
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        margin: 0;
+        font-family: var(--font-heading);
+        transition: transform 0.3s ease;
+    }
+
+    .collection-card:hover .collection-info h3 {
+        transform: translateY(-4px);
+    }
+
+    .collection-cta {
+        color: var(--gold-color);
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .collection-card:hover .collection-cta {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Gold shimmer border on hover */
+    .collection-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        transition: border-color 0.4s ease;
+        pointer-events: none;
+    }
+
+    .collection-card:hover::after {
+        border-color: var(--gold-color);
+    }
+
+    /* ============================
+       ABOUT IMAGE
+       ============================ */
+    .about-img-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
+    .about-img-wrap::before {
+        content: '';
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        right: -16px;
+        bottom: -16px;
+        border: 2px solid var(--gold-color);
+        border-radius: 12px;
+        z-index: 0;
+        opacity: 0.45;
+    }
+
+    .about-img-wrap img {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ============================
+       PRODUCT CARD
+       ============================ */
     .product-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
         border-color: var(--gold-color);
     }
 
-    .radio-btn {
-        cursor: pointer;
-    }
-
-    .radio-btn input {
-        display: none;
-    }
-
+    /* ============================
+       FINDER RADIO BUTTONS
+       ============================ */
+    .radio-btn { cursor: pointer; }
+    .radio-btn input { display: none; }
     .radio-btn span {
         display: inline-block;
         padding: 10px 20px;
@@ -323,7 +435,6 @@ try {
         border-radius: 30px;
         transition: all 0.3s;
     }
-
     .radio-btn input:checked+span {
         background-color: var(--text-color);
         color: #fff;
